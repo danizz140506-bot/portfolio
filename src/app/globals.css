@@ -1,26 +1,152 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%, 35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%, 85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
   }
 }
 
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@theme {
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide var(--speed, 3s) ease-in-out infinite alternate;
+}
+
+.animate-spin-around {
+  animation: spin-around calc(var(--speed, 3s) * 2) infinite linear;
+}
+
+/* Floating animations for skills orbit */
+@keyframes float-0 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5px, -10px) rotate(2deg);
+  }
+  50% {
+    transform: translate(-5px, -5px) rotate(-1deg);
+  }
+  75% {
+    transform: translate(-10px, -8px) rotate(1deg);
+  }
+}
+
+@keyframes float-1 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-8px, -6px) rotate(-2deg);
+  }
+  50% {
+    transform: translate(6px, -12px) rotate(1deg);
+  }
+  75% {
+    transform: translate(4px, -4px) rotate(-1deg);
+  }
+}
+
+@keyframes float-2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(10px, -8px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-4px, -14px) rotate(-2deg);
+  }
+  75% {
+    transform: translate(-8px, -6px) rotate(1deg);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-iceland), monospace;
+  background-color: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* Custom selection */
+::selection {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Smooth image loading */
+img {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+img[data-loading="true"] {
+  opacity: 0;
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Images stay colorful on touch devices, grayscale only on hover-capable devices */
+@media (hover: hover) {
+  .image-grayscale {
+    filter: grayscale(100%);
+  }
+  
+  .image-grayscale:hover,
+  .group:hover .image-grayscale {
+    filter: grayscale(0%);
+  }
+}
+
+/* Touch devices - images always colorful */
+@media (hover: none) {
+  .image-grayscale {
+    filter: grayscale(0%);
+  }
 }
