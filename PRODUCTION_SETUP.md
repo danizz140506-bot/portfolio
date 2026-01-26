@@ -1,92 +1,179 @@
-# Production Setup Guide
+# Production Deployment Guide
 
-## Email Configuration (Resend)
+## Environment Variables
 
-### Step 1: Verify Your Domain
+### Required Environment Variables
 
-1. Go to [Resend Domains](https://resend.com/domains)
-2. Click **"Add Domain"**
-3. Enter: `danish.my`
-4. Resend will provide DNS records to add:
-   - **SPF Record** (for email authentication)
-   - **DKIM Record** (for email signing)
-   - **DMARC Record** (optional, recommended)
-5. Add these records to your domain's DNS settings (wherever you manage `danish.my`)
-6. Wait for verification (usually 5-15 minutes)
-7. Once verified, you'll see a green checkmark
-
-### Step 2: Update Environment Variables
-
-After domain verification, update your `.env.local` (and production environment):
+Add these to your hosting platform (Vercel, Netlify, Railway, etc.):
 
 ```env
-RESEND_API_KEY=re_LJMdWpaY_AV7S7W1nr8gbwmw2zTbB1dfL
-RESEND_FROM_EMAIL=Portfolio Contact <noreply@danish.my>
-RESEND_TO_EMAIL=iskandar@danish.my
+EMAIL_HOST=mail.privateemail.com
+EMAIL_PORT=465
+EMAIL_USER=iskandar@danish.my
+EMAIL_PASS=your_email_password_here
 ```
 
-### Step 3: Test
+**⚠️ Important:**
+- Never commit `.env.local` to git (already in `.gitignore`)
+- Use your actual email password for `EMAIL_PASS`
+- These variables are server-side only (not exposed to the client)
 
-1. Restart your server
-2. Test the contact form
-3. Check that emails arrive from `noreply@danish.my`
-4. Verify you can reply directly to the sender
+## Deployment Platforms
 
-## Production Deployment Checklist
+### Vercel (Recommended for Next.js)
+
+1. **Push your code to GitHub/GitLab/Bitbucket**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Deploy to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "Add New Project"
+   - Import your repository
+   - Vercel will auto-detect Next.js
+
+3. **Add Environment Variables**
+   - Go to Project Settings → Environment Variables
+   - Add each variable:
+     - `EMAIL_HOST` = `mail.privateemail.com`
+     - `EMAIL_PORT` = `465`
+     - `EMAIL_USER` = `iskandar@danish.my`
+     - `EMAIL_PASS` = `your_password`
+   - Click "Save"
+   - Redeploy (or it will auto-deploy)
+
+4. **Build Settings**
+   - Build Command: `npm run build` (auto-detected)
+   - Output Directory: `.next` (auto-detected)
+   - Install Command: `npm install` (auto-detected)
+
+### Netlify
+
+1. **Push code to Git repository**
+
+2. **Deploy to Netlify**
+   - Go to [netlify.com](https://netlify.com)
+   - Click "Add new site" → "Import an existing project"
+   - Connect your repository
+
+3. **Build Settings**
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+   - Base directory: (leave empty)
+
+4. **Add Environment Variables**
+   - Go to Site Settings → Environment Variables
+   - Add all 4 variables (same as above)
+
+### Railway
+
+1. **Connect Repository**
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+
+2. **Add Environment Variables**
+   - Go to Variables tab
+   - Add all 4 variables
+
+3. **Build Settings**
+   - Railway auto-detects Next.js
+
+### Other Platforms
+
+For any Node.js hosting platform:
+- Set environment variables in the platform's dashboard
+- Build command: `npm run build`
+- Start command: `npm start`
+- Node version: 18.x or higher
+
+## Pre-Deployment Checklist
+
+### Code
+- [x] All features working locally
+- [x] Contact form tested and working
+- [x] No console errors
+- [x] Responsive design tested on mobile/tablet
 
 ### Environment Variables
-- [ ] Add `RESEND_API_KEY` to production environment (Vercel, Netlify, etc.)
-- [ ] Add `RESEND_FROM_EMAIL` after domain verification
-- [ ] Never commit `.env.local` to git (already in `.gitignore`)
+- [ ] `.env.local` is in `.gitignore` (should already be)
+- [ ] All 4 SMTP variables added to hosting platform
+- [ ] Password is correct (case-sensitive)
+
+### Build Test
+```bash
+npm run build
+npm start
+```
+- [ ] Build completes without errors
+- [ ] Site loads correctly on `localhost:3000`
+- [ ] Contact form works in production build
 
 ### Security
-- [x] Rate limiting implemented (5 requests per minute per IP)
+- [x] Rate limiting implemented (5 requests/minute)
 - [x] Input validation and sanitization
 - [x] XSS protection
-- [x] API key stored server-side only
-- [x] Error messages don't expose sensitive information
+- [x] Credentials stored server-side only
+- [x] Error messages don't expose sensitive info
 
-### Performance
-- [x] Email sending is async (non-blocking)
-- [x] Proper error handling
-- [x] Input length limits
+## Post-Deployment Testing
 
-### Monitoring
-- Consider adding logging service (e.g., Sentry) for production errors
-- Monitor Resend dashboard for email delivery rates
-- Set up alerts for failed email sends
+1. **Visit your deployed site**
+   - Test all pages load correctly
+   - Check mobile responsiveness
 
-## Current Features
+2. **Test Contact Form**
+   - Fill out the form
+   - Submit and verify success message
+   - Check your email (`iskandar@danish.my`)
+   - Verify email content is correct
+   - Test replying to the email (should go to sender)
 
-✅ **Rate Limiting**: 5 requests per minute per IP address
-✅ **Input Validation**: Name, email format, message length (10-5000 chars)
-✅ **XSS Protection**: All inputs are sanitized
-✅ **Professional Email Template**: HTML and plain text versions
-✅ **Error Handling**: Graceful error messages
-✅ **Security**: API key never exposed to client
-
-## Testing
-
-Test the contact form:
-1. Fill out all fields
-2. Submit the form
-3. Check your email (`iskandar@danish.my`)
-4. Verify the email looks professional
-5. Test replying to the email (should go to sender)
+3. **Check Server Logs**
+   - Look for any errors in hosting platform logs
+   - Verify `[CONTACT API]` logs appear when submitting form
 
 ## Troubleshooting
 
-**Emails not sending?**
-- Check Resend API key is correct
-- Check Resend dashboard for error logs
-- Verify domain is verified (if using custom domain)
-- Check server logs for errors
+### Build Fails
+- Check Node.js version (need 18+)
+- Check for TypeScript errors: `npm run lint`
+- Check for missing dependencies
 
-**Rate limit errors?**
-- Wait 1 minute between submissions
-- This prevents spam/abuse
+### Contact Form Not Working
+- Verify all 4 environment variables are set correctly
+- Check password is correct (case-sensitive)
+- Check server logs for SMTP errors
+- Verify `EMAIL_PORT` is `465` (not 587)
+- Test SMTP connection locally first
 
-**Domain verification failing?**
-- Double-check DNS records are added correctly
-- Wait up to 24 hours for DNS propagation
-- Contact Resend support if issues persist
+### Emails Not Sending
+- Check Namecheap Private Email is active
+- Verify SMTP credentials in Namecheap dashboard
+- Check server logs for authentication errors
+- Ensure `EMAIL_PASS` matches your email password exactly
+
+### Rate Limit Errors
+- Wait 1 minute between test submissions
+- This is intentional to prevent spam
+
+## Current Features
+
+✅ **SMTP Email Sending**: Namecheap Private Email via Nodemailer  
+✅ **Rate Limiting**: 5 requests per minute per IP  
+✅ **Input Validation**: Name, email format, message length  
+✅ **XSS Protection**: All inputs sanitized  
+✅ **Professional Email Template**: HTML and plain text  
+✅ **Error Handling**: Graceful error messages  
+✅ **Security**: Credentials never exposed to client  
+✅ **Responsive Design**: Mobile and tablet optimized  
+
+## Support
+
+If you encounter issues:
+1. Check server logs in your hosting platform
+2. Verify environment variables are set correctly
+3. Test locally with `npm run build && npm start`
+4. Check Namecheap Private Email settings

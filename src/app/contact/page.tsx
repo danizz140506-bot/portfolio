@@ -51,7 +51,6 @@ export default function ContactPage() {
     setSubmitStatus("idle");
 
     try {
-      // Send email via API route
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
@@ -64,24 +63,31 @@ export default function ContactPage() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Failed to parse response:", jsonError);
+        throw new Error("Invalid response from server");
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send email");
+        const errorMsg = data?.error || `Server error: ${response.status}`;
+        console.error("API error:", errorMsg);
+        throw new Error(errorMsg);
       }
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });
       
-      // Reset status after 5 seconds
       setTimeout(() => {
         setSubmitStatus("idle");
       }, 5000);
     } catch (error) {
-      console.error("Email sending failed:", error);
+      console.error("Form submission error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message. Please try again or email me directly at iskandar@danish.my";
       setSubmitStatus("error");
       
-      // Reset error status after 5 seconds
       setTimeout(() => {
         setSubmitStatus("idle");
       }, 5000);
@@ -115,7 +121,7 @@ export default function ContactPage() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
 

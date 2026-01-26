@@ -129,7 +129,7 @@ export default function MultiOrbitSemiCircle({
         coords.push(presetPositions[i]);
       } else {
         // Generate additional positions if needed
-        let x, y, attempts = 0;
+        let x: number, y: number, attempts = 0;
         do {
           x = padding + Math.random() * (100 - 2 * padding);
           y = padding + Math.random() * (100 - 2 * padding);

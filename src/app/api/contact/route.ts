@@ -1,12 +1,9 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { NextRequest, NextResponse } from "next/server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Simple in-memory rate limiting (for production, use Redis or similar)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 5; // Max 5 requests
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT = 5;
+const RATE_LIMIT_WINDOW = 60 * 1000;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -25,45 +22,64 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// Get client IP
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
   const realIP = request.headers.get("x-real-ip");
   return forwarded?.split(",")[0] || realIP || "unknown";
 }
 
+function sanitize(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 export async function POST(request: NextRequest) {
+  console.log("[CONTACT API] POST request received");
+
   try {
-    // Rate limiting
     const clientIP = getClientIP(request);
     if (!checkRateLimit(clientIP)) {
+      console.log("[CONTACT API] Rate limit exceeded");
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
         { status: 429 }
       );
     }
 
-    // Check Content-Type
     const contentType = request.headers.get("content-type");
     if (!contentType?.includes("application/json")) {
+      console.log("[CONTACT API] Invalid content type");
       return NextResponse.json(
         { error: "Invalid content type" },
         { status: 400 }
       );
     }
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error("[CONTACT API] JSON parse error");
+      return NextResponse.json(
+        { error: "Invalid request format" },
+        { status: 400 }
+      );
+    }
+
     const { name, email, message } = body;
 
-    // Validate input exists
     if (!name || !email || !message) {
+      console.log("[CONTACT API] Missing required fields");
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
       );
     }
 
-    // Validate input length
     if (name.length > 100) {
       return NextResponse.json(
         { error: "Name is too long (max 100 characters)" },
@@ -85,14 +101,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (message.length < 10) {
+    if (message.trim().length === 0) {
       return NextResponse.json(
-        { error: "Message is too short (min 10 characters)" },
+        { error: "Message cannot be empty" },
         { status: 400 }
       );
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -101,42 +116,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sanitize input to prevent XSS
-    const sanitize = (str: string) => {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;");
-    };
+    const emailHost = process.env.EMAIL_HOST;
+    const emailPort = process.env.EMAIL_PORT;
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS;
 
-    const sanitizedName = sanitize(name);
-    const sanitizedEmail = sanitize(email);
-    const sanitizedMessage = sanitize(message).replace(/\n/g, "<br>");
-
-    // Check if Resend API key is configured
-    if (!process.env.RESEND_API_KEY) {
-      console.error("RESEND_API_KEY is not configured");
+    if (!emailHost || !emailPort || !emailUser || !emailPass) {
+      console.error("[CONTACT API] SMTP credentials not configured");
       return NextResponse.json(
         { error: "Email service is not configured" },
         { status: 500 }
       );
     }
 
-    // Send email via Resend
-    // Production: Use verified domain email (e.g., noreply@danish.my)
-    // After verifying your domain in Resend dashboard, set RESEND_FROM_EMAIL in .env.local
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
-    const recipientEmail = process.env.RESEND_TO_EMAIL || "iskandar@danish.my";
-    
-    console.log("Attempting to send email:", { fromEmail, recipientEmail, hasApiKey: !!process.env.RESEND_API_KEY });
-    
-    const { data, error } = await resend.emails.send({
-      from: fromEmail,
-      to: [recipientEmail],
+    console.log("[CONTACT API] Creating SMTP transport:", {
+      host: emailHost,
+      port: emailPort,
+      user: emailUser,
+      secure: true,
+    });
+
+    const transporter = nodemailer.createTransport({
+      host: emailHost,
+      port: parseInt(emailPort, 10),
+      secure: true,
+      auth: {
+        user: emailUser,
+        pass: emailPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    console.log("[CONTACT API] SMTP transport created successfully");
+
+    console.log("[CONTACT API] Verifying SMTP connection...");
+    try {
+      await transporter.verify();
+      console.log("[CONTACT API] SMTP connection verified successfully");
+    } catch (verifyError) {
+      console.error("[CONTACT API] SMTP verification failed:", verifyError);
+      if (verifyError instanceof Error) {
+        console.error("[CONTACT API] Verification error message:", verifyError.message);
+        console.error("[CONTACT API] Verification error code:", (verifyError as any).code);
+      }
+      throw new Error(`SMTP connection failed: ${verifyError instanceof Error ? verifyError.message : "Unknown error"}`);
+    }
+
+    const sanitizedName = sanitize(name);
+    const sanitizedEmail = sanitize(email);
+    const sanitizedMessage = sanitize(message).replace(/\n/g, "<br>");
+
+    const mailOptions = {
+      from: `"Portfolio Contact" <${emailUser}>`,
+      to: "iskandar@danish.my",
       replyTo: email,
-      subject: `Portfolio Contact: ${sanitizedName}`,
+      subject: `Portfolio Contact: ${name}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -188,42 +224,31 @@ ${message}
 ---
 This email was sent from your portfolio contact form.
 You can reply directly to this email to respond to ${name}.`,
+    };
+
+    console.log("[CONTACT API] Attempting to send email...");
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("[CONTACT API] Email sent successfully:", {
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
     });
 
-    if (error) {
-      console.error("Resend error details:", JSON.stringify(error, null, 2));
-      // Provide more helpful error message based on error type
-      let errorMessage = "Failed to send email. Please try again later.";
-      if (error.message?.includes("domain")) {
-        errorMessage = "Domain verification issue. Please check your Resend domain settings.";
-      } else if (error.message?.includes("API key") || error.message?.includes("Unauthorized")) {
-        errorMessage = "Email service configuration error. Please contact support.";
-      }
-      return NextResponse.json(
-        { error: errorMessage },
-        { status: 500 }
-      );
-    }
-
-    // Log successful send (without sensitive data)
-    console.log(`Contact form submission sent successfully from ${email.substring(0, 3)}***`);
-
     return NextResponse.json(
-      { success: true, message: "Email sent successfully" },
+      { success: true },
       { status: 200 }
     );
   } catch (error) {
-    // Handle JSON parsing errors
-    if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { error: "Invalid request format" },
-        { status: 400 }
-      );
+    console.error("[CONTACT API] Error:", error);
+    if (error instanceof Error) {
+      console.error("[CONTACT API] Error message:", error.message);
+      console.error("[CONTACT API] Error code:", (error as any).code);
     }
 
-    console.error("API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to send email. Please try again later." },
       { status: 500 }
     );
   }
