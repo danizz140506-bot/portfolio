@@ -116,6 +116,15 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Hide scrollbar for elements with scrollbar-hide */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* Smooth image loading */
 img {
   opacity: 1;

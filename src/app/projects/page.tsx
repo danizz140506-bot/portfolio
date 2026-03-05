@@ -123,7 +123,7 @@ export default function ProjectsPage() {
   const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : null;
 
   return (
-    <div className="relative h-screen bg-[#000] text-white font-[var(--font-iceland)] overflow-hidden">
+    <div className="relative h-[100dvh] bg-[#000] text-white font-[var(--font-iceland)] overflow-hidden">
       <Particles
         className="fixed inset-0"
         quantity={100}
@@ -134,7 +134,7 @@ export default function ProjectsPage() {
 
       <Navbar />
 
-      <main className="relative z-10 h-screen flex flex-col overflow-hidden">
+      <main className="relative z-10 h-[100dvh] flex flex-col overflow-hidden">
         {/* Compact Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
