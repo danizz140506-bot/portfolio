@@ -369,7 +369,7 @@ export default function ProjectsPage() {
                     <div className="absolute -inset-4 bg-white/[0.02] rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                     {/* Image */}
-                    <div className="relative rounded-lg sm:rounded-xl overflow-hidden border border-white/10 bg-white/5 max-h-[30vh] sm:max-h-[35vh] lg:max-h-none">
+                    <div className="relative rounded-lg sm:rounded-xl overflow-hidden border border-white/10 bg-white/5">
                       <Image
                         src={project.image}
                         alt={project.imageAlt}
