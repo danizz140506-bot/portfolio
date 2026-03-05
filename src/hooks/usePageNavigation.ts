@@ -138,22 +138,18 @@ export function usePageNavigation({
             }
 
             const { isAtTop, isAtBottom } = getScrollState();
-            const singleViewport = isSingleViewport();
 
             // Swipe up (scroll down) at bottom → next page
+            // No scroll-through requirement for touch — swiping is intentional
             if (deltaY > minSwipe && downRoute && !hasNavigatedDown.current && isAtBottom) {
-                if (singleViewport || hasReachedTop.current) {
-                    hasNavigatedDown.current = true;
-                    router.push(downRoute);
-                }
+                hasNavigatedDown.current = true;
+                router.push(downRoute);
             }
 
             // Swipe down (scroll up) at top → previous page
             if (deltaY < -minSwipe && upRoute && !hasNavigatedUp.current && isAtTop) {
-                if (singleViewport || hasReachedBottom.current) {
-                    hasNavigatedUp.current = true;
-                    router.push(upRoute);
-                }
+                hasNavigatedUp.current = true;
+                router.push(upRoute);
             }
 
             touchStartY.current = null;
