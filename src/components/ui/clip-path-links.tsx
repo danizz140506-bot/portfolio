@@ -1,20 +1,22 @@
 "use client";
 
 import React from "react";
-import { FaDiscord } from "react-icons/fa";
+import { FaDiscord, FaThreads, FaLinkedinIn } from "react-icons/fa6";
 import { Github, Instagram, Facebook } from "lucide-react";
 import { useAnimate } from "framer-motion";
 
 export const ClipPathLinks = () => {
   return (
     <div className="divide-y border divide-white/20 border-white/20 w-full">
-      <div className="grid grid-cols-2 divide-x divide-white/20">
+      <div className="grid grid-cols-3 divide-x divide-white/20">
         <LinkBox Icon={Instagram} href="https://www.instagram.com/izz1405" />
         <LinkBox Icon={Facebook} href="https://www.facebook.com/share/1DUKWjnfZC/" />
+        <LinkBox Icon={FaThreads} href="https://www.threads.com/@izz1405" />
       </div>
-      <div className="grid grid-cols-2 divide-x divide-white/20">
+      <div className="grid grid-cols-3 divide-x divide-white/20">
         <LinkBox Icon={FaDiscord} href="https://discordapp.com/users/374179770553860097" />
         <LinkBox Icon={Github} href="https://github.com/danizz140506-bot" />
+        <LinkBox Icon={FaLinkedinIn} href="https://www.linkedin.com/in/danish-iskandar-1501673a1/" />
       </div>
     </div>
   );

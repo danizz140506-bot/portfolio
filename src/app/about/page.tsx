@@ -1,50 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Particles } from "@/components/ui/particles";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 
 export default function AboutPage() {
-  const router = useRouter();
-  const hasNavigatedUp = useRef(false);
-  const hasNavigatedDown = useRef(false);
-  const threshold = 100;
-
-  useEffect(() => {
-    hasNavigatedUp.current = false;
-    hasNavigatedDown.current = false;
-  }, []);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-      const documentHeight = document.documentElement.scrollHeight;
-      const isAtTop = scrollY <= threshold;
-      const isAtBottom = windowHeight + scrollY >= documentHeight - threshold;
-
-      if (e.deltaY > 0 && !hasNavigatedDown.current && isAtBottom) {
-        hasNavigatedDown.current = true;
-        router.push("/projects");
-        return;
-      }
-
-      if (e.deltaY < 0 && !hasNavigatedUp.current && isAtTop) {
-        hasNavigatedUp.current = true;
-        router.push("/");
-        return;
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [router]);
+  usePageNavigation({
+    upRoute: "/",
+    downRoute: "/services",
+  });
 
   // Stagger animation variants
   const containerVariants = {

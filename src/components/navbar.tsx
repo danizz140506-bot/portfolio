@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
+  { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
   { label: "Skills", href: "/skills" },
   { label: "Contact", href: "/contact" },
@@ -88,16 +89,14 @@ export function Navbar() {
               <Link
                 href={item.href}
                 onClick={(e) => handleClick(e, item.href)}
-                className={`relative text-xs md:text-sm tracking-[0.15em] uppercase transition-all duration-300 hover:opacity-100 cursor-pointer group ${
-                  isActive ? "opacity-100" : "opacity-60 hover:opacity-90"
-                }`}
+                className={`relative text-xs md:text-sm tracking-[0.15em] uppercase transition-all duration-300 hover:opacity-100 cursor-pointer group ${isActive ? "opacity-100" : "opacity-60 hover:opacity-90"
+                  }`}
               >
                 {item.label}
                 {/* Underline indicator */}
                 <span
-                  className={`absolute -bottom-1 left-0 h-px bg-white transition-all duration-300 ${
-                    isActive ? "w-full" : "w-0 group-hover:w-full"
-                  }`}
+                  className={`absolute -bottom-1 left-0 h-px bg-white transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
                 />
               </Link>
             </motion.div>
@@ -192,11 +191,10 @@ export function Navbar() {
                       <Link
                         href={item.href}
                         onClick={(e) => handleClick(e, item.href)}
-                        className={`block py-3 text-sm tracking-[0.15em] uppercase transition-all duration-300 ${
-                          isActive
+                        className={`block py-3 text-sm tracking-[0.15em] uppercase transition-all duration-300 ${isActive
                             ? "opacity-100 border-l-2 border-white pl-4"
                             : "opacity-60 hover:opacity-100 pl-6"
-                        }`}
+                          }`}
                       >
                         {item.label}
                       </Link>

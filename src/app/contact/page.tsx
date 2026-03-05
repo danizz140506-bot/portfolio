@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { ClipPathLinks } from "@/components/ui/clip-path-links";
 import { Particles } from "@/components/ui/particles";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 
 export default function ContactPage() {
-  const router = useRouter();
-  const hasNavigated = useRef(false);
-  const threshold = 100;
+  usePageNavigation({
+    upRoute: "/skills",
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,29 +21,6 @@ export default function ContactPage() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
-  useEffect(() => {
-    hasNavigated.current = false;
-  }, []);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (hasNavigated.current) return;
-
-      const scrollY = window.scrollY;
-
-      if (e.deltaY < 0 && scrollY <= threshold) {
-        hasNavigated.current = true;
-        router.push("/skills");
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +56,7 @@ export default function ContactPage() {
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });
-      
+
       setTimeout(() => {
         setSubmitStatus("idle");
       }, 5000);
@@ -87,7 +64,7 @@ export default function ContactPage() {
       console.error("Form submission error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to send message. Please try again or email me directly at iskandar@danish.my";
       setSubmitStatus("error");
-      
+
       setTimeout(() => {
         setSubmitStatus("idle");
       }, 5000);
@@ -203,11 +180,10 @@ export default function ContactPage() {
             <div className="relative">
               <label
                 htmlFor="name"
-                className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                  focusedField === "name" || formData.name
-                    ? "-top-2.5 text-xs opacity-60 bg-black px-1"
-                    : "top-3.5 text-sm opacity-40"
-                }`}
+                className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === "name" || formData.name
+                  ? "-top-2.5 text-xs opacity-60 bg-black px-1"
+                  : "top-3.5 text-sm opacity-40"
+                  }`}
               >
                 Name
               </label>
@@ -228,11 +204,10 @@ export default function ContactPage() {
             <div className="relative">
               <label
                 htmlFor="email"
-                className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                  focusedField === "email" || formData.email
-                    ? "-top-2.5 text-xs opacity-60 bg-black px-1"
-                    : "top-3.5 text-sm opacity-40"
-                }`}
+                className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === "email" || formData.email
+                  ? "-top-2.5 text-xs opacity-60 bg-black px-1"
+                  : "top-3.5 text-sm opacity-40"
+                  }`}
               >
                 Email
               </label>
@@ -253,11 +228,10 @@ export default function ContactPage() {
             <div className="relative">
               <label
                 htmlFor="message"
-                className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                  focusedField === "message" || formData.message
-                    ? "-top-2.5 text-xs opacity-60 bg-black px-1"
-                    : "top-3.5 text-sm opacity-40"
-                }`}
+                className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === "message" || formData.message
+                  ? "-top-2.5 text-xs opacity-60 bg-black px-1"
+                  : "top-3.5 text-sm opacity-40"
+                  }`}
               >
                 Message
               </label>

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import MultiOrbitSemiCircle from "@/components/ui/multi-orbit-semi-circle";
 import { Particles } from "@/components/ui/particles";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 
 const skills = [
   // Web Technologies
@@ -39,8 +38,16 @@ const skills = [
   },
   // Backend & Systems
   {
+    name: "PHP",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+  },
+  {
     name: "Laravel",
     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg",
+  },
+  {
+    name: "Node.js",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
   },
   {
     name: "MySQL",
@@ -53,6 +60,15 @@ const skills = [
   {
     name: "Git",
     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+  },
+  {
+    name: "Vercel",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
+  },
+  // Animation & Libraries
+  {
+    name: "Framer Motion",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/framermotion/framermotion-original.svg",
   },
   // AI & Productivity Tools
   {
@@ -71,52 +87,13 @@ const skills = [
     name: "Cursor",
     icon: "https://www.cursor.com/favicon.ico",
   },
-  {
-    name: "Google AntiGravity",
-    icon: "/images/antigravity.webp",
-  },
 ];
 
 export default function SkillsPage() {
-  const router = useRouter();
-  const hasNavigatedUp = useRef(false);
-  const hasNavigatedDown = useRef(false);
-  const threshold = 100;
-
-  useEffect(() => {
-    hasNavigatedUp.current = false;
-    hasNavigatedDown.current = false;
-  }, []);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-      const documentHeight = document.documentElement.scrollHeight;
-      const isAtTop = scrollY <= threshold;
-      const isAtBottom = windowHeight + scrollY >= documentHeight - threshold;
-
-      // Scrolling down at bottom - navigate to contact
-      if (e.deltaY > 0 && !hasNavigatedDown.current && isAtBottom) {
-        hasNavigatedDown.current = true;
-        router.push("/contact");
-        return;
-      }
-
-      // Scrolling up at top - navigate to projects
-      if (e.deltaY < 0 && !hasNavigatedUp.current && isAtTop) {
-        hasNavigatedUp.current = true;
-        router.push("/projects");
-        return;
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [router]);
+  usePageNavigation({
+    upRoute: "/projects",
+    downRoute: "/contact",
+  });
 
   const skillIcons = skills.map((skill) => skill.icon);
   const skillLabels = skills.map((skill) => skill.name);

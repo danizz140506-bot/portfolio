@@ -1,41 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Navbar } from "@/components/navbar";
 import { EtherealShadow } from "@/components/ui/ethereal-shadow";
+import { usePageNavigation } from "@/hooks/usePageNavigation";
 
 export default function Home() {
   const router = useRouter();
-  const hasNavigated = useRef(false);
-  const threshold = 100;
 
-  useEffect(() => {
-    hasNavigated.current = false;
-  }, []);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (hasNavigated.current) return;
-
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-      const documentHeight = document.documentElement.scrollHeight;
-
-      if (e.deltaY > 0 && windowHeight + scrollY >= documentHeight - threshold) {
-        hasNavigated.current = true;
-        router.push("/about");
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [router]);
+  usePageNavigation({
+    downRoute: "/about",
+  });
 
   return (
     <div className="relative bg-[#000] text-white font-[var(--font-iceland)] min-h-screen overflow-hidden">

@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -116,60 +116,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emailHost = process.env.EMAIL_HOST;
-    const emailPort = process.env.EMAIL_PORT;
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
+    const resendApiKey = process.env.RESEND_API_KEY;
 
-    if (!emailHost || !emailPort || !emailUser || !emailPass) {
-      console.error("[CONTACT API] SMTP credentials not configured");
+    if (!resendApiKey) {
+      console.error("[CONTACT API] RESEND_API_KEY not configured");
       return NextResponse.json(
         { error: "Email service is not configured" },
         { status: 500 }
       );
     }
 
-    console.log("[CONTACT API] Creating SMTP transport:", {
-      host: emailHost,
-      port: emailPort,
-      user: emailUser,
-      secure: true,
-    });
-
-    const transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: parseInt(emailPort, 10),
-      secure: true,
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    console.log("[CONTACT API] SMTP transport created successfully");
-
-    console.log("[CONTACT API] Verifying SMTP connection...");
-    try {
-      await transporter.verify();
-      console.log("[CONTACT API] SMTP connection verified successfully");
-    } catch (verifyError) {
-      console.error("[CONTACT API] SMTP verification failed:", verifyError);
-      if (verifyError instanceof Error) {
-        console.error("[CONTACT API] Verification error message:", verifyError.message);
-        console.error("[CONTACT API] Verification error code:", (verifyError as any).code);
-      }
-      throw new Error(`SMTP connection failed: ${verifyError instanceof Error ? verifyError.message : "Unknown error"}`);
-    }
+    const resend = new Resend(resendApiKey);
 
     const sanitizedName = sanitize(name);
     const sanitizedEmail = sanitize(email);
     const sanitizedMessage = sanitize(message).replace(/\n/g, "<br>");
 
-    const mailOptions = {
-      from: `"Portfolio Contact" <${emailUser}>`,
+    console.log("[CONTACT API] Sending email via Resend...");
+
+    const { data, error } = await resend.emails.send({
+      from: "Portfolio Contact <onboarding@resend.dev>",
       to: "iskandar@danish.my",
       replyTo: email,
       subject: `Portfolio Contact: ${name}`,
@@ -185,18 +151,18 @@ export async function POST(request: NextRequest) {
               <h1 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 15px; margin-top: 0; font-size: 24px; font-weight: 600;">
                 New Contact Form Submission
               </h1>
-              
+
               <div style="margin-top: 25px;">
                 <div style="margin-bottom: 15px;">
                   <strong style="color: #666; display: inline-block; min-width: 80px;">Name:</strong>
                   <span style="color: #000;">${sanitizedName}</span>
                 </div>
-                
+
                 <div style="margin-bottom: 15px;">
                   <strong style="color: #666; display: inline-block; min-width: 80px;">Email:</strong>
                   <a href="mailto:${sanitizedEmail}" style="color: #000; text-decoration: none;">${sanitizedEmail}</a>
                 </div>
-                
+
                 <div style="margin-top: 25px;">
                   <strong style="color: #666; display: block; margin-bottom: 10px;">Message:</strong>
                   <div style="background-color: #f9f9f9; padding: 20px; border-left: 4px solid #000; border-radius: 4px; white-space: pre-wrap; color: #333;">
@@ -204,7 +170,7 @@ export async function POST(request: NextRequest) {
                   </div>
                 </div>
               </div>
-              
+
               <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
                 <p style="margin: 0;">This email was sent from your portfolio contact form.</p>
                 <p style="margin: 5px 0 0 0;">You can reply directly to this email to respond to ${sanitizedName}.</p>
@@ -224,17 +190,17 @@ ${message}
 ---
 This email was sent from your portfolio contact form.
 You can reply directly to this email to respond to ${name}.`,
-    };
-
-    console.log("[CONTACT API] Attempting to send email...");
-
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log("[CONTACT API] Email sent successfully:", {
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected,
     });
+
+    if (error) {
+      console.error("[CONTACT API] Resend error:", error);
+      return NextResponse.json(
+        { error: "Failed to send email. Please try again later." },
+        { status: 500 }
+      );
+    }
+
+    console.log("[CONTACT API] Email sent successfully:", data);
 
     return NextResponse.json(
       { success: true },
@@ -242,10 +208,6 @@ You can reply directly to this email to respond to ${name}.`,
     );
   } catch (error) {
     console.error("[CONTACT API] Error:", error);
-    if (error instanceof Error) {
-      console.error("[CONTACT API] Error message:", error.message);
-      console.error("[CONTACT API] Error code:", (error as any).code);
-    }
 
     return NextResponse.json(
       { error: "Failed to send email. Please try again later." },
