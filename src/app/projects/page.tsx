@@ -432,8 +432,8 @@ export default function ProjectsPage() {
           className="flex-shrink-0 px-4 sm:px-6 md:px-12 pb-3 sm:pb-4 md:pb-6 pt-2"
         >
           <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
-            {/* Left: Previous project */}
-            <div className="w-1/3">
+            {/* Left: Previous project (desktop only) */}
+            <div className="hidden lg:block w-1/3">
               {prevProject ? (
                 <button
                   onClick={goToPrevious}
@@ -452,7 +452,7 @@ export default function ProjectsPage() {
                       d="M15 19l-7-7 7-7"
                     />
                   </svg>
-                  <div className="hidden sm:block text-left">
+                  <div className="text-left">
                     <span className="text-[10px] tracking-[0.15em] uppercase opacity-50 block">
                       Previous
                     </span>
@@ -481,14 +481,14 @@ export default function ProjectsPage() {
               ))}
             </div>
 
-            {/* Right: Next project */}
-            <div className="w-1/3 flex justify-end">
+            {/* Right: Next project (desktop only) */}
+            <div className="hidden lg:flex w-1/3 justify-end">
               {nextProject ? (
                 <button
                   onClick={goToNext}
                   className="group flex items-center gap-2 sm:gap-3 opacity-50 hover:opacity-100 transition-all duration-300"
                 >
-                  <div className="hidden sm:block text-right">
+                  <div className="text-right">
                     <span className="text-[10px] tracking-[0.15em] uppercase opacity-50 block">
                       Next Project
                     </span>
@@ -511,7 +511,7 @@ export default function ProjectsPage() {
                   </svg>
                 </button>
               ) : (
-                <span className="hidden lg:inline text-[10px] sm:text-xs tracking-widest uppercase opacity-30">
+                <span className="text-[10px] sm:text-xs tracking-widest uppercase opacity-30">
                   Scroll for more
                 </span>
               )}
