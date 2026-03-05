@@ -310,7 +310,7 @@ export default function ContactPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.3 }}
         transition={{ delay: 1.5 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase"
+        className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase"
       >
         Scroll up to go back
       </motion.div>

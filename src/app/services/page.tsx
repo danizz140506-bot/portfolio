@@ -224,8 +224,8 @@ export default function ServicesPage() {
                                     onMouseEnter={() => setActiveService(service.id)}
                                     onMouseLeave={() => setActiveService(null)}
                                     className={`group relative rounded-xl sm:rounded-2xl border transition-all duration-500 cursor-default overflow-hidden ${isActive
-                                            ? "border-white/20 bg-white/[0.04]"
-                                            : "border-white/[0.08] bg-white/[0.02] hover:border-white/15"
+                                        ? "border-white/20 bg-white/[0.04]"
+                                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/15"
                                         }`}
                                 >
                                     {/* Glow effect on hover */}
@@ -294,8 +294,8 @@ export default function ServicesPage() {
                                                 >
                                                     <div
                                                         className={`w-1 h-1 rounded-full transition-all duration-500 ${isActive
-                                                                ? "bg-white/60 scale-110"
-                                                                : "bg-white/20"
+                                                            ? "bg-white/60 scale-110"
+                                                            : "bg-white/20"
                                                             }`}
                                                     />
                                                     <span className="text-[11px] sm:text-xs tracking-wide">
@@ -369,7 +369,7 @@ export default function ServicesPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.3 }}
                 transition={{ delay: 1.5 }}
-                className="fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase"
+                className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase"
             >
                 Scroll to continue
             </motion.div>

@@ -511,7 +511,7 @@ export default function ProjectsPage() {
                   </svg>
                 </button>
               ) : (
-                <span className="text-[10px] sm:text-xs tracking-widest uppercase opacity-30">
+                <span className="hidden lg:inline text-[10px] sm:text-xs tracking-widest uppercase opacity-30">
                   Scroll for more
                 </span>
               )}

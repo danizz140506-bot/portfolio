@@ -120,7 +120,7 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-3xl md:text-4xl font-normal">2024</div>
+                  <div className="text-3xl md:text-4xl font-normal">2022</div>
                   <div className="text-xs tracking-wider uppercase opacity-50 mt-1">
                     Started Coding
                   </div>
@@ -191,7 +191,7 @@ export default function AboutPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.4 }}
         transition={{ delay: 1.5 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase opacity-40"
+        className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest uppercase opacity-40"
       >
         Scroll to continue
       </motion.div>
