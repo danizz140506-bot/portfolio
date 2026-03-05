@@ -431,7 +431,7 @@ export default function ProjectsPage() {
           }}
           className="flex-shrink-0 px-4 sm:px-6 md:px-12 pb-3 sm:pb-4 md:pb-6 pt-2"
         >
-          <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-center lg:justify-between">
             {/* Left: Previous project (desktop only) */}
             <div className="hidden lg:block w-1/3">
               {prevProject ? (
