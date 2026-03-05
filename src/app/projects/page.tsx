@@ -381,6 +381,30 @@ export default function ProjectsPage() {
                         priority
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                      {/* Image Carousel Arrows (mobile/tablet) */}
+                      {prevProject && (
+                        <button
+                          onClick={goToPrevious}
+                          className="lg:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-black/50 border border-white/20 backdrop-blur-sm active:scale-90 transition-all duration-200"
+                          aria-label="Previous project"
+                        >
+                          <svg className="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                      )}
+                      {nextProject && (
+                        <button
+                          onClick={goToNext}
+                          className="lg:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-black/50 border border-white/20 backdrop-blur-sm active:scale-90 transition-all duration-200"
+                          aria-label="Next project"
+                        >
+                          <svg className="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
 
                     {/* Watermark number */}
@@ -393,56 +417,7 @@ export default function ProjectsPage() {
             </AnimatePresence>
           </div>
 
-          {/* Floating Side Arrows (mobile/tablet) */}
-          {prevProject && (
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              onClick={goToPrevious}
-              className="lg:hidden absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.12] backdrop-blur-sm active:scale-90 transition-all duration-200"
-              aria-label="Previous project"
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 opacity-70"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </motion.button>
-          )}
 
-          {nextProject && (
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              onClick={goToNext}
-              className="lg:hidden absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.12] backdrop-blur-sm active:scale-90 transition-all duration-200"
-              aria-label="Next project"
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 opacity-70"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </motion.button>
-          )}
         </div>
 
         {/* Bottom Navigation */}
