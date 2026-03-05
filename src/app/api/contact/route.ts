@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     console.log("[CONTACT API] Sending email via Resend...");
 
     const { data, error } = await resend.emails.send({
-      from: "Portfolio Contact <onboarding@resend.dev>",
+      from: "Portfolio Contact <noreply@iskandar.danish.my>",
       to: "iskandar@danish.my",
       replyTo: email,
       subject: `Portfolio Contact: ${name}`,
