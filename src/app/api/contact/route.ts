@@ -135,10 +135,10 @@ export async function POST(request: NextRequest) {
     console.log("[CONTACT API] Sending email via Resend...");
 
     const { data, error } = await resend.emails.send({
-      from: "Portfolio Contact <noreply@iskandar.danish.my>",
+      from: "Iskandar <iskandar@danish.my>",
       to: "iskandar@danish.my",
       replyTo: email,
-      subject: `Portfolio Contact: ${name}`,
+      subject: `New Portfolio Inquiry \u2013 ${name}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -148,48 +148,39 @@ export async function POST(request: NextRequest) {
           </head>
           <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
             <div style="background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <h1 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 15px; margin-top: 0; font-size: 24px; font-weight: 600;">
-                New Contact Form Submission
-              </h1>
+              <h2 style="color: #000; margin-top: 0; font-size: 20px; font-weight: 600;">
+                You received a new message from your portfolio website.
+              </h2>
 
               <div style="margin-top: 25px;">
                 <div style="margin-bottom: 15px;">
-                  <strong style="color: #666; display: inline-block; min-width: 80px;">Name:</strong>
-                  <span style="color: #000;">${sanitizedName}</span>
+                  <strong style="color: #555;">Name:</strong>
+                  <span style="color: #000;"> ${sanitizedName}</span>
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                  <strong style="color: #666; display: inline-block; min-width: 80px;">Email:</strong>
-                  <a href="mailto:${sanitizedEmail}" style="color: #000; text-decoration: none;">${sanitizedEmail}</a>
+                  <strong style="color: #555;">Email:</strong>
+                  <span style="color: #000;"> ${sanitizedEmail}</span>
                 </div>
 
                 <div style="margin-top: 25px;">
-                  <strong style="color: #666; display: block; margin-bottom: 10px;">Message:</strong>
+                  <strong style="color: #555; display: block; margin-bottom: 10px;">Message:</strong>
                   <div style="background-color: #f9f9f9; padding: 20px; border-left: 4px solid #000; border-radius: 4px; white-space: pre-wrap; color: #333;">
                     ${sanitizedMessage}
                   </div>
                 </div>
               </div>
-
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
-                <p style="margin: 0;">This email was sent from your portfolio contact form.</p>
-                <p style="margin: 5px 0 0 0;">You can reply directly to this email to respond to ${sanitizedName}.</p>
-              </div>
             </div>
           </body>
         </html>
       `,
-      text: `New Contact Form Submission
+      text: `You received a new message from your portfolio website.
 
 Name: ${name}
 Email: ${email}
 
 Message:
-${message}
-
----
-This email was sent from your portfolio contact form.
-You can reply directly to this email to respond to ${name}.`,
+${message}`,
     });
 
     if (error) {
